@@ -9,8 +9,8 @@ Section with_parameters.
         let/d v1 := get c1 in
         let/d v2 := get c2 in
         let/d v3 := get c3 in
-        let/d c1 := put v1 c2 in
-        let/d c2 := put v2 c3 in
+        let/d c2 := put v1 c2 in
+        let/d c3 := put v2 c3 in
         let/d c1 := put v3 c1 in
         (c1, c2, c3).
 
@@ -18,8 +18,7 @@ Section with_parameters.
   Definition ThreeCells a_ptr b_ptr c_ptr abc
   : list word -> Semantics.mem -> Prop :=
   fun _ =>
-    seps [cell_value a_ptr (fst (fst abc)); cell_value b_ptr (snd (fst abc)); cell_value c_ptr (snd abc)].
-
+  (cell_value a_ptr (fst (fst abc)) * cell_value b_ptr (snd (fst abc)) * cell_value c_ptr (snd abc))%sep.
 
     Hint Unfold ThreeCells : compiler.
     Derive swapthree_body SuchThat
@@ -30,7 +29,7 @@ Section with_parameters.
             sep (ThreeCells a_ptr b_ptr c_ptr (a,b,c) []) R mem ->
             WeakestPrecondition.call
                 (swapthree :: functions)
-                "swap"
+                "swapthree"
                 tr mem [a_ptr;b_ptr;c_ptr]
                 (postcondition_func_norets
                     (ThreeCells a_ptr b_ptr c_ptr (swapthree_gallina_spec a b c))
@@ -38,6 +37,8 @@ Section with_parameters.
     As swapthree_body_correct.
     Proof.
     try compile.
-    Abort.
+    Qed.
+
+    Print swapthree_body.
 
 End with_parameters.
